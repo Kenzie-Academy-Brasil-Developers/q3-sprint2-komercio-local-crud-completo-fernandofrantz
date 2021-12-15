@@ -1,4 +1,8 @@
 # Seu código aqui
+from flask import Flask, request, jsonify
+
+app = Flask(__name__)
+
 produtos = [
     {"id": 1, "name": "sabonete", "price": 5.99},
     {"id": 2, "name": "perfume", "price": 39.90},
@@ -31,3 +35,56 @@ produtos = [
     {"id": 29, "name": "coberta", "price": 55.99},
     {"id": 30, "name": "sofa", "price": 600.15}
 ]
+
+@app.get('/')
+def get_endpoints():
+    return {'message': 'endpoints', 'products': '/products'}
+
+@app.get('/products')
+def list_products():
+    return jsonify(produtos), 200
+
+@app.get('/products/<product_id>')
+def get(product_id):
+    product_id = int(product_id)
+    if product_id < 0 or product_id > 30:
+        return {'message': 'product not found'}
+    else:
+        return jsonify(produtos[product_id - 1])
+
+@app.post('/products')
+def create():
+    new_product = {"id": 31, "name": "poltrona", "price": 300.15}
+    produtos.append(new_product)
+    return jsonify(new_product), '201 - CREATED'
+
+@app.patch('/products/<product_id>')
+def update(product_id):
+    name = 'Batman'
+    price = ''
+    product_id = int(product_id)
+    product_to_edit = [product for product in produtos if product['id'] == product_id]
+    if name and price:
+        new_product = {'id': product_to_edit[0]['id'], 'name': name, 'price': price}
+        print(new_product)
+        return '', '204 - NO CONTENT'
+    elif name:
+        new_product = {'id': product_to_edit[0]['id'], 'name': name, 'price': product_to_edit[0]['price']}
+        print(new_product)
+        return '', '204 - NO CONTENT'
+    elif price:
+        new_product = {'id': product_to_edit[0]['id'], 'name': product_to_edit[0]['name'], 'price': price}
+        print(new_product)
+        return '', '204 - NO CONTENT'
+    else:
+        return 'nothing was changed', '200 - NO CONTENT'
+
+@app.delete('/products/<product_id>')
+def delete(product_id):
+    product_id = int(product_id)
+    if product_id < 0 or product_id > 30:
+        return {'message': 'product not found'}
+    else:
+        product_to_delete = [product for product in produtos if product['id'] == product_id]
+        produtos.remove(product_to_delete[0])
+        return '', '204 - NO CONTENT'
