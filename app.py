@@ -1,4 +1,3 @@
-# Seu código aqui
 from flask import Flask, request, jsonify
 
 app = Flask(__name__)
